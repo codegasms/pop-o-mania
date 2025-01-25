@@ -9,6 +9,7 @@
 #include <thread>
 
 #include "SDL2/SDL.h"
+#include "gamemanager.hpp"
 #include "raylib.h"
 
 #define PLATFORM_DESKTOP
@@ -121,6 +122,8 @@ struct Globals {
     Shader shdrOutline;
     Shader shdrTest;
     std::shared_ptr<State> CurrentState;
+
+    GameManager* gameManager = GameManager::getInstance();
 
     Globals() = default;
 

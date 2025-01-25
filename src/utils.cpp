@@ -124,6 +124,15 @@ Rectangle GetRaylibOriginR(Rectangle a) {
 
 // ============== Drawing functions ============== //
 
+// Find the nth digit of a number
+int nthDigit(int v, int n) {
+    while (n > 0) {
+        v /= 10;
+        n--;
+    }
+    return "0123456789"[v % 10] - '0';
+}
+
 // Draw a centered and scaled Texture
 void DrawTextureCenter(Texture2D tex, float x, float y, float s, Color color) {
     DrawTextureEx(tex, ScaleCords(GetRaylibOrigin({x, y, tex.width * s, tex.height * s})), 0,
@@ -188,9 +197,41 @@ void DrawTextureSlider(Texture2D tex, float x, float y, Color color, float s) {
                   0, Scale(1.0f / Global.sliderTexSize), color);
 }
 
-void DrawSpinnerMeter(Texture2D, float);
+void DrawSpinnerBack(Texture2D tex, Color color) {
+    float x = 0;
+    float y = 0;
+    float ratio = (float)tex.width / (float)tex.height;
+    float defaultRatio = 640.0f / 480.0f;
+    if (defaultRatio > ratio) {
+        x = 640.0f - 480.0f * ratio;
+    } else {
+        y = 480.0f - 640.0f / ratio;
+    }
+    Rectangle source = {0, 0, tex.width, tex.height};
+    DrawTexturePro(tex, source, ScaleRect(Rectangle{0 + x / 2.0f, y / 2.0f, 640 - x, (480.0f - y)}),
+                   Vector2{0, 0}, 0, color);
+}
 
-void DrawSpinnerBack(Texture2D, Color);
+void DrawSpinnerMeter(Texture2D tex, float per) {
+    per = clip(per, 0.001f, 0.999f);
+    float x = 0;
+    float y = 0;
+    float ratio = (float)tex.width / (float)tex.height;
+    float defaultRatio = 640.0f / 480.0f;
+    if (defaultRatio > ratio) {
+        x = 640.0f - 480.0f * ratio;
+    } else {
+        y = 480.0f - 640.0f / ratio;
+    }
+    Rectangle source = {0, tex.height * (1.0f - per), tex.width, tex.height * per};
+    DrawTexturePro(tex, Rectangle{0, 0, tex.width, tex.height},
+                   ScaleRect(Rectangle{0 + x / 2.0f, 0 + y / 2.0f, 640 - x, 480 - y}),
+                   Vector2{0, 0}, 0, BLACK);
+    DrawTexturePro(tex, source,
+                   ScaleRect(Rectangle{0 + x / 2.0f, (480.0f - y) * (1.0f - per) + y / 2.0f,
+                                       640 - x, (480.0f - y) * per}),
+                   Vector2{0, 0}, 0, WHITE);
+}
 
 // ============== Math functions ============== //
 
@@ -244,14 +285,6 @@ std::string getSampleSetFromInt(int s) {
 
 // ============== Extra Utility functions ============== //
 
-inline Vector2 operator+(Vector2 p0, Vector2 p1) { return Vector2Add(p0, p1); }
-
-inline Vector2 operator-(Vector2 p0, Vector2 p1) { return Vector2Subtract(p0, p1); }
-
-inline Vector2 operator*(Vector2 p0, Vector2 p1) { return Vector2Multiply(p0, p1); }
-
-inline Vector2 operator/(Vector2 p0, Vector2 p1) { return Vector2Divide(p0, p1); }
-
 float easeInOutCubic(float x) { return x; }
 
 float easeOutQuad(float x) { return 1.0f - ((1.0f - x) * (1.0f - x)); }
@@ -260,8 +293,61 @@ bool AreSame(double a, double b) { return std::fabs(a - b) < 0.0001f; }
 
 // ============== File functions ============== //
 
-std::vector<std::string> ParseNameFolder(std::string);
-std::vector<std::string> ParseNameFile(std::string);
+std::vector<std::string> ParseNameFolder(std::string folder) {
+    std::vector<std::string> output;
+    if (folder[folder.size() - 1] == '/') {
+        folder.pop_back();
+    }
+    int end = folder.size() - 1;
+    int begin = folder.size() - 1;
+    while (begin >= 0 and folder[begin] != '-') begin--;
+    begin = std::max(0, begin);
+    if (folder[begin] == '-') {
+        output.push_back("");
+        for (int i = begin + 2; i <= end; i++) output[output.size() - 1].push_back(folder[i]);
+        end = std::max(0, begin - 2);
+        begin = std::max(0, begin - 2);
+        while (begin >= 0 and !isdigit(folder[begin])) begin--;
+        begin = std::max(0, begin);
+        if (isdigit(folder[begin])) {
+            output.push_back("");
+            for (int i = begin + 2; i <= end; i++) output[output.size() - 1].push_back(folder[i]);
+            end = std::max(0, begin);
+            begin = std::max(0, begin);
+            begin = 0;
+            if (isdigit(folder[begin])) {
+                output.push_back("");
+                for (int i = begin; i <= end; i++) output[output.size() - 1].push_back(folder[i]);
+                end = std::max(0, begin - 2);
+                begin = std::max(0, begin - 2);
+            }
+        } else if (begin == 0) {
+            output.push_back("");
+            for (int i = begin; i <= end; i++) output[output.size() - 1].push_back(folder[i]);
+            end = std::max(0, begin);
+            begin = std::max(0, begin);
+        }
+    } else {
+        output.push_back(folder);
+    }
+
+    if (output.size() == 0) {
+        output.push_back(folder);
+    }
+    return output;
+}
+
+std::vector<std::string> ParseNameFile(std::string file) {
+    std::vector<std::string> output;
+    Parser parser = Parser();
+    GameFile geym = parser.parseMetadata(file);
+    output.push_back(geym.configMetadata["Title"]);
+    output.push_back(geym.configMetadata["Artist"]);
+    output.push_back(geym.configMetadata["Creator"]);
+    output.push_back(geym.configMetadata["Version"]);
+    output.push_back(geym.configMetadata["BeatmapSetID"]);
+    return output;
+}
 
 // ============== Timer functions ============== //
 
@@ -293,3 +379,109 @@ bool IsRenderTextureReady(RenderTexture2D target) {
 float getAngle(Vector2 p1, Vector2 p2) { return atan2(p1.y - p2.y, p1.x - p2.x); }
 
 std::vector<std::string> getAudioFilenames(int, int, int, int, int, int, int, std::string);
+std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex,
+                                           int defaultSampleSet, int normalSet, int additionSet,
+                                           int hitSound, int index, std::string filename) {
+    int defaultSampleSetForObject = 0;
+    int defaultSampleIndexForObject = timingSampleIndex;
+
+    if (timingSet == 1)
+        defaultSampleSetForObject = 0;
+    else if (timingSet == 2)
+        defaultSampleSetForObject = 1;
+    else if (timingSet == 3)
+        defaultSampleSetForObject = 2;
+    else
+        defaultSampleSetForObject = defaultSampleSet;
+
+    int NormalSetForObject = 0;
+
+    int HitSoundForObject = 0;
+    int SampleIndexForObject = 0;
+
+    if (normalSet == 1)
+        NormalSetForObject = 0;
+    else if (normalSet == 2)
+        NormalSetForObject = 1;
+    else if (normalSet == 3)
+        NormalSetForObject = 2;
+    else
+        NormalSetForObject = defaultSampleSetForObject;
+
+    if (hitSound == 2)
+        HitSoundForObject = 1;
+    else if (hitSound == 4)
+        HitSoundForObject = 2;
+    else if (hitSound == 8)
+        HitSoundForObject = 3;
+    else
+        HitSoundForObject = 0;
+
+    if (index != 0)
+        SampleIndexForObject = index;
+    else
+        SampleIndexForObject = defaultSampleIndexForObject;
+
+    std::string HitSoundIndex = "";
+
+    if (!(SampleIndexForObject == 0)) {
+        HitSoundIndex = std::to_string(SampleIndexForObject);
+    }
+
+    std::string NormalFileName;
+
+    if (NormalSetForObject == 0)
+        NormalFileName = "normal-hitnormal";
+    else if (NormalSetForObject == 1)
+        NormalFileName = "soft-hitnormal";
+    else
+        NormalFileName = "drum-hitnormal";
+
+    std::vector<std::string> out;
+
+    out.push_back(NormalFileName + HitSoundIndex);
+    out.push_back(NormalFileName);
+
+    std::string AdditionFilename;
+
+    int AdditionSetForObject = 0;
+
+    if (additionSet == 1)
+        AdditionSetForObject = 0;
+    else if (additionSet == 2)
+        AdditionSetForObject = 1;
+    else if (additionSet == 3)
+        AdditionSetForObject = 2;
+    else
+        AdditionSetForObject = NormalSetForObject;
+
+    if (AdditionSetForObject == 0)
+        AdditionFilename = "normal-hit";
+    else if (AdditionSetForObject == 1)
+        AdditionFilename = "soft-hit";
+    else
+        AdditionFilename = "drum-hit";
+
+    if (filename.size() > 4) {
+        if (filename[filename.size() - 5] == '.') {
+            for (int i = 0; i < 4; i++) filename.pop_back();
+        }
+        out.push_back(filename);
+        out.push_back(AdditionFilename);
+    } else {
+        if ((hitSound & (1 << 1)) != 0) {
+            out.push_back(AdditionFilename + "whistle" + HitSoundIndex);
+            out.push_back(AdditionFilename + "whistle");
+        }
+        if ((hitSound & (1 << 2)) != 0) {
+            out.push_back(AdditionFilename + "finish" + HitSoundIndex);
+            out.push_back(AdditionFilename + "finish");
+        }
+        if ((hitSound & (1 << 3)) != 0) {
+            out.push_back(AdditionFilename + "clap" + HitSoundIndex);
+            out.push_back(AdditionFilename + "clap");
+        }
+    }
+
+    return out;
+}
