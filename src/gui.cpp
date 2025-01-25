@@ -155,3 +155,90 @@ void TextBox::update() {
         }
     }
 }
+
+SelectableList::SelectableList(Vector2 position, Vector2 size, Color color,
+                               std::vector<std::string> text, Color textcolor, int textsize,
+                               int objectsize, int maxlength)
+    : GuiElement(position, size),
+      color(color),
+      text(text),
+      textcolor(textcolor),
+      textsize(textsize),
+      objectsize(objectsize),
+      maxlength(maxlength) {
+    init();
+}
+
+void SelectableList::render() {
+    bg.render();
+    bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
+    for (int i = renderindex1; i < renderindex2; i++) {
+        if (mouseSelect and i == mouseSelectIndex) {
+            objects[i].hover = true;
+        }
+        if (selectedindex == i) {
+            objects[i].focused = true;
+        }
+        objects[i].render();
+        if (selectedindex == i) {
+            objects[i].focused = false;
+        }
+        if (mouseSelect and i == mouseSelectIndex) {
+            objects[i].hover = false;
+        }
+    }
+
+    if (hover) DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
+}
+
+void SelectableList::update() {
+    action = false;
+    renderindex2 = renderindex1 + std::min((int)size.y / objectsize, (int)objects.size());
+    bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
+    mouseSelect = false;
+    if (hover) {
+        selectedindex -= Global.Wheel;
+        if (selectedindex >= (int)objects.size()) {
+            selectedindex = 0;
+        }
+        if (selectedindex < 0) {
+            selectedindex = objects.size() - 1;
+        }
+        if (selectedindex >= renderindex2) {
+            renderindex1 = selectedindex - size.y / objectsize + 1;
+            renderindex2 = renderindex1 + std::min((int)size.y / objectsize, (int)objects.size());
+        }
+        if (selectedindex < renderindex1) {
+            renderindex1 = selectedindex;
+            renderindex2 = renderindex1 + std::min((int)size.y / objectsize, (int)objects.size());
+        }
+        mouseSelectIndex =
+            renderindex1 + (int)((Global.MousePosition.y - this->getRect().y) / objectsize);
+        mouseSelect = true;
+        if (selectedindex == mouseSelectIndex and Global.Key1P) {
+            action = true;
+        }
+        if (Global.Key1P) {
+            selectedindex = mouseSelectIndex;
+        }
+    }
+    for (int i = renderindex1; i < renderindex2; i++) {
+        objects[i].position = {position.x, position.y - size.y / 2.0f +
+                                               (i - renderindex1) * objectsize + objectsize / 2.0f};
+    }
+    for (int i = renderindex1; i < renderindex2; i++) {
+        if (selectedindex == i) objects[i].focused = true;
+        objects[i].update();
+        if (selectedindex == i) objects[i].focused = false;
+    }
+}
+
+void SelectableList::init() {
+    for (int i = 0; i < text.size(); i++) {
+        objects.push_back(TextBox({0, 0}, {size.x, (float)objectsize}, color, text[i].c_str(),
+                                  textcolor, textsize, maxlength));
+        objects[objects.size() - 1].init();
+    }
+    text.clear();
+    bg = TextBox({position.x, position.y}, {size.x, size.y}, color, " ", BLACK, 0, 50);
+}
