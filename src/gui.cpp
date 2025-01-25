@@ -242,3 +242,55 @@ void SelectableList::init() {
     text.clear();
     bg = TextBox({position.x, position.y}, {size.x, size.y}, color, " ", BLACK, 0, 50);
 }
+
+Switch::Switch(Vector2 position, Vector2 size, Color color, Color altcolor, Color outcolor,
+               Color switchcolor)
+    : GuiElement(position, size),
+      color(color),
+      altcolor(altcolor),
+      switchcolor(switchcolor),
+      outcolor(outcolor) {}
+
+void Switch::render() {
+    Rectangle Left =
+        GetRaylibOriginR({position.x - size.x / 4.0f, position.y, size.x / 2.0f, size.y});
+    Rectangle Right =
+        GetRaylibOriginR({position.x + size.x / 4.0f, position.y, size.x / 2.0f, size.y});
+    if (this->state) {
+        DrawRectangleRec(ScaleRect(Left), this->altcolor);
+        DrawRectangleRec(ScaleRect(Right), this->switchcolor);
+    } else {
+        DrawRectangleRec(ScaleRect(Left), this->switchcolor);
+        DrawRectangleRec(ScaleRect(Right), this->color);
+    }
+    if (this->focused) {
+        DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
+    } else {
+        DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), this->outcolor);
+    }
+}
+
+void Switch::update() {
+    bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
+    bool click = Global.MouseInFocus and Global.Key1P;
+
+    if (hover and click) {
+        this->focused = true;
+        this->clicked = true;
+        this->focusbreak = false;
+    } else if (hover) {
+        this->focused = true;
+        this->clicked = false;
+    } else {
+        this->focused = false;
+        this->clicked = false;
+        this->focusbreak = true;
+    }
+
+    if (hover and !focusbreak and Global.Key1R)
+        action = true;
+    else
+        action = false;
+
+    if (action == true) this->state = !this->state;
+}
