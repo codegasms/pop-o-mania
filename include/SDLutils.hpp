@@ -1,11 +1,11 @@
 #pragma once
 
-#include "SDL2/SDL.h"
-#include "globals.hpp"
+#include <chrono>
+#include <cstdio>
+#include <ctime>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <cstdio>
-#include <iostream>
-#include <ctime>
-#include <chrono>
 
+#include "SDL2/SDL.h"
+#include "globals.hpp"
