@@ -235,9 +235,11 @@ inline Vector2 operator*(Vector2 p0, Vector2 p1) { return Vector2Multiply(p0, p1
 
 inline Vector2 operator/(Vector2 p0, Vector2 p1) { return Vector2Divide(p0, p1); }
 
-float easeInOutCubic(float);
-float easeOutQuad(float);
-bool AreSame(double, double);
+float easeInOutCubic(float x) { return x; }
+
+float easeOutQuad(float x) { return 1.0f - ((1.0f - x) * (1.0f - x)); }
+
+bool AreSame(double a, double b) { return std::fabs(a - b) < 0.0001f; }
 
 // ============== File functions ============== //
 
@@ -246,18 +248,31 @@ std::vector<std::string> ParseNameFile(std::string);
 
 // ============== Timer functions ============== //
 
-void initTimer();
+void initTimer() { Global.start = std::chrono::steady_clock::now(); };
 void pauseTimer();
 void resumeTimer();
-double getTimer();
-void addOffsetTimer(unsigned long long int);
+double getTimer() {
+    Global.end = std::chrono::steady_clock::now();
+    return (Global.end - Global.start).count() / 1000000.0;
+};
+void addOffsetTimer(unsigned long long int time) { Global.pausedFor += time; }
 void updateTimer();
 
 // ============== Raylib functions ============== //
 
-bool IsTextureReady(Texture2D);
-bool IsRenderTextureReady(RenderTexture2D);
+bool IsTextureReady(Texture2D texture) {
+    return ((texture.id > 0) &&                             // Validate OpenGL id
+            (texture.width > 0) && (texture.height > 0) &&  // Validate texture size
+            (texture.format > 0) &&                         // Validate texture pixel format
+            (texture.mipmaps > 0));  // Validate texture mipmaps (at least 1 for basic mipmap level)
+}
 
-float getAngle(Vector2, Vector2);
+bool IsRenderTextureReady(RenderTexture2D target) {
+    return ((target.id > 0) &&                // Validate OpenGL id
+            IsTextureReady(target.depth) &&   // Validate FBO depth texture/renderbuffer
+            IsTextureReady(target.texture));  // Validate FBO texture
+}
+
+float getAngle(Vector2 p1, Vector2 p2) { return atan2(p1.y - p2.y, p1.x - p2.x); }
 
 std::vector<std::string> getAudioFilenames(int, int, int, int, int, int, int, std::string);
