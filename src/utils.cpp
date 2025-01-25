@@ -10,16 +10,81 @@
 // ============== Global variables ============== //
 
 // Update the variables needed for the scrolling
-void updateUpDown();
+void updateUpDown() {
+    // Get the current state of the mouse wheel
+    Global.Wheel = GetMouseWheelMove();
+    if (IsKeyPressed(SDL_SCANCODE_DOWN)) {
+        // If the down key is pressed, start a timer to simulate a fast mouse wheel movement
+        Global.Wheel = -1;
+        Global.FrameTimeCounterWheel = -170;
+    }
+    if (IsKeyPressed(SDL_SCANCODE_UP)) {
+        // If the up key is pressed, start a timer to simulate a fast mouse wheel movement
+        Global.Wheel = 1;
+        Global.FrameTimeCounterWheel = -170;
+    }
+    Global.FrameTimeCounterWheel += GetFrameTime() * 1000.0f;
+    while (Global.FrameTimeCounterWheel > 50.0f) {
+        // If the keys are still down, trigger a wheel movement every 50 milliseconds
+        Global.FrameTimeCounterWheel -= 50.0f;
+        if (IsKeyDown(SDL_SCANCODE_UP)) Global.Wheel = 1;
+        if (IsKeyDown(SDL_SCANCODE_DOWN)) Global.Wheel = -1;
+    }
+};
 
-// Get the scaling needed for the current window size
-void GetScale();
+// Get the scaling needed for the current window size + Offset for the zero point
+void GetScale() {
+    Global.Scale = std::min(GetScreenWidth() / 640.0f, GetScreenHeight() / 480.0f);
+    Global.ZeroPoint = {GetScreenWidth() / 2.0f - (Global.Scale * 320.0f),
+                        GetScreenHeight() / 2.0f - (Global.Scale * 240.0f)};
+};
 
-// Get the absolute Mouse position
-void GetMouse();
+// Get the absolute Mouse position & Check if in bound
+void GetMouse() {
+    Global.MouseInFocus = CheckCollisionPointRec(
+        GetMousePosition(), (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()});
+    if (!Global.MouseInFocus) {
+        Global.MousePosition = {0, 0};
+    } else {
+        if (Global.useAuto)
+            Global.MousePosition = Global.AutoMousePosition;
+        else
+            Global.MousePosition = {(GetMouseX() - Global.ZeroPoint.x) / Global.Scale,
+                                    (GetMouseY() - Global.ZeroPoint.y) / Global.Scale};
+    }
+};
 
-// Get the states of the main keys
-void GetKeys();
+// Get the states of the main keys : Z, X, Mouse Left, Mouse Right => Pressed, Down, Released
+void GetKeys() {
+    if (IsKeyPressed(SDL_SCANCODE_Z) or
+        (Global.enableMouse and IsMouseButtonPressed(SDL_BUTTON_LEFT)))
+        Global.Key1P = true;
+    else
+        Global.Key1P = false;
+    if (IsKeyPressed(SDL_SCANCODE_X) or
+        (Global.enableMouse and IsMouseButtonPressed(SDL_BUTTON_RIGHT)))
+        Global.Key2P = true;
+    else
+        Global.Key2P = false;
+    if (IsKeyDown(SDL_SCANCODE_Z) or (Global.enableMouse and IsMouseButtonDown(SDL_BUTTON_LEFT)))
+        Global.Key1D = true;
+    else
+        Global.Key1D = false;
+    if (IsKeyDown(SDL_SCANCODE_X) or (Global.enableMouse and IsMouseButtonDown(SDL_BUTTON_RIGHT)))
+        Global.Key2D = true;
+    else
+        Global.Key2D = false;
+    if (IsKeyReleased(SDL_SCANCODE_Z) or
+        (Global.enableMouse and IsMouseButtonReleased(SDL_BUTTON_LEFT)))
+        Global.Key1R = true;
+    else
+        Global.Key1R = false;
+    if (IsKeyReleased(SDL_SCANCODE_X) or
+        (Global.enableMouse and IsMouseButtonReleased(SDL_BUTTON_RIGHT)))
+        Global.Key2R = true;
+    else
+        Global.Key2R = false;
+};
 
 // ============== Scaling functions ============== //
 
