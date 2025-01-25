@@ -29,11 +29,11 @@ void SleepInUs(uint32 us);
 
 inline void SleepInSeconds(uint32 sec) { SleepInMs(sec * 1000); }
 
-// Monotonic timestamp in msec
-inline uint64 NowInMs() { return NowInUs() / 1000; }
-
 // Monotonic timestamp in usec
 uint64 NowInUs();
+
+// Monotonic timestamp in msec
+inline uint64 NowInMs() { return NowInUs() / 1000; }
 
 class WallTimer {
    public:
