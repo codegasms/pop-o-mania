@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <gamemanager.hpp>
 #include <globals.hpp>
 #include <iostream>
 #include <utils.hpp>
@@ -130,10 +131,26 @@ void DrawTextureCenter(Texture2D tex, float x, float y, float s, Color color) {
 }
 
 // Draw centered and scaled combo numbers
-void DrawCNumbersCenter(int, float, float, float, Color);
+void DrawCNumbersCenter(int n, float x, float y, float s, Color color) {
+    GameManager *gm = GameManager::getInstance();
+    int digits = log10(n) + 1;
+    int i = (digits - 1) * 18;
+    for (int k = 0; k < digits; k++) {
+        DrawTextureCenter(gm->numbers[nthDigit(n, digits - k - 1)],
+                          x - (float)i * s + k * 18 * s * 2, y, s, color);
+    }
+}
 
 // Draw scaled combo numbers from left to right
-void DrawCNumbersLeft(int, float, float, float, Color);
+void DrawCNumbersLeft(int n, float x, float y, float s, Color color) {
+    GameManager *gm = GameManager::getInstance();
+    int digits = log10(n) + 1;
+    int i = (digits - 1) * 18;
+    for (int k = 0; k < digits; k++) {
+        DrawTextureCenter(gm->numbers[nthDigit(n, digits - k - 1)], x + k * 18 * s * 2, y, s,
+                          color);
+    }
+}
 
 // Draw a centered/left and scaled Texture with a rotation
 void DrawTextCenter(const char *text, float x, float y, float s, Color color) {
