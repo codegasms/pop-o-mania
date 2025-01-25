@@ -89,30 +89,37 @@ void GetKeys() {
 // ============== Scaling functions ============== //
 
 // Scale a number based on the current scaling factor
-float Scale(float);
+float Scale(float a) { return a * Global.Scale; };
 
 // Scale a Rectangle based on the current scaling factor
-Rectangle ScaleRect(Rectangle);
+Rectangle ScaleRect(Rectangle a) {
+    return {a.x * Global.Scale + Global.ZeroPoint.x, a.y * Global.Scale + Global.ZeroPoint.y,
+            a.width * Global.Scale, a.height * Global.Scale};
+};
 
 // Scale a Vector based on the current scaling factor with origin offset
-Vector2 ScaleCords(Vector2);
+Vector2 ScaleCords(Vector2 a) {
+    return {a.x * Global.Scale + Global.ZeroPoint.x, a.y * Global.Scale + Global.ZeroPoint.y};
+};
 
 // Scale the X position and add the origin offset
-float ScaleCordX(float);
+float ScaleCordX(float a) { return a * Global.Scale + Global.ZeroPoint.x; };
 
 // Scale the Y position and add the origin offset
-float ScaleCordY(float);
+float ScaleCordY(float a) { return a * Global.Scale + Global.ZeroPoint.y; };
 
 // ============== Get Data functions ============== //
 
 // Get the center point of a rectangle
-Vector2 GetCenter(Rectangle);
+Vector2 GetCenter(Rectangle a) { return {a.x + a.width / 2, a.y + a.height / 2}; };
 
 // Get the "origin" of a rectangle for raylib drawing functions and return a vector
-Vector2 GetRaylibOrigin(Rectangle);
+Vector2 GetRaylibOrigin(Rectangle a) { return {a.x - a.width / 2, a.y - a.height / 2}; };
 
 // Get the "origin" of a rectangle for raylib drawing functions and return a rectangle
-Rectangle GetRaylibOriginR(Rectangle);
+Rectangle GetRaylibOriginR(Rectangle a) {
+    return {a.x - a.width / 2, a.y - a.height / 2, a.width, a.height};
+};
 
 // ============== Drawing functions ============== //
 
