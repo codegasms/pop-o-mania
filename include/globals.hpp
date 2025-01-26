@@ -101,7 +101,15 @@ struct Globals {
 
     float FrameTimeCounterWheel = 0.f;
 
+    Music menuMusic;
+
     Texture2D popOManiaLogo;
+
+    Texture2D credit1;
+    Texture2D credit2;
+    Texture2D credit3;
+    Texture2D credit4;
+    Texture2D credit5;
 
     double volume = 0.4f;
     double hitVolume = 0.7f;

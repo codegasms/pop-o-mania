@@ -70,11 +70,31 @@ class LoadMenu : public State {
     void unload() override;
 };
 
+class CreditMenu : public State {
+   private:
+    Button back;
+    Button close;
+
+    TextBox bg;
+    TextBox path;
+    TextBox description;
+    TextBox us;
+
+   public:
+    CreditMenu();
+
+    void init() override;
+    void render() override;
+    void update() override;
+    void unload() override;
+};
+
 class MainMenu : public State {
    private:
     Button play;
     Button wip;
     Button load;
+    Button credits;
 
     TestSlider volume;
 
