@@ -193,9 +193,82 @@ void LoadMenu::update() {
 }
 void LoadMenu::unload() {}
 
+CreditMenu::CreditMenu() {
+    description =
+        TextBox({320, 140}, {520, 40}, {240, 98, 161, 255},
+                "Credts? More Like Pops Of Fame!\n\n      Our Github Handles      ", WHITE, 15, 50);
+    bg = TextBox({320, 240}, {530, 290}, {240, 98, 161, 255}, "", {240, 98, 161, 255}, 15, 10);
+    us = TextBox({320, 200}, {520, 40}, {240, 98, 161, 255},
+                 "SahooBishwajeet      Suvansarkar\nShrishti0308         Vinayak-Anand", WHITE, 15,
+                 50);
+    back = Button({320, 360}, {120, 40}, {255, 135, 198, 255}, "Back", BLACK, 15);
+    close = Button({70, 110}, {20, 20}, {255, 135, 198, 255}, "x", BLACK, 15);
+}
+
+void CreditMenu::init() {
+    Global.NeedForBackgroundClear = true;
+    Global.useAuto = false;
+    Global.LastFrameTime = getTimer();
+    Global.FrameTime = 0.5;
+}
+
+void CreditMenu::render() {
+    // Global.mutex.lock();
+    bg.render();
+    description.render();
+    us.render();
+    back.render();
+    close.render();
+
+    float startX = 90;
+    float y = 250;
+    float width = 75;
+    float height = 75;
+    float spacing = 20;
+
+    DrawTexturePro(Global.credit1,
+                   {0, 0, (float)Global.credit1.width, (float)Global.credit1.height},
+                   {startX, y, width, height}, {0, 0}, 0, WHITE);
+
+    DrawTexturePro(Global.credit2,
+                   {0, 0, (float)Global.credit2.width, (float)Global.credit2.height},
+                   {startX + width + spacing, y, width, height}, {0, 0}, 0, WHITE);
+
+    DrawTexturePro(Global.credit3,
+                   {0, 0, (float)Global.credit3.width, (float)Global.credit3.height},
+                   {startX + (width + spacing) * 2, y, width, height}, {0, 0}, 0, WHITE);
+
+    DrawTexturePro(Global.credit4,
+                   {0, 0, (float)Global.credit4.width, (float)Global.credit4.height},
+                   {startX + (width + spacing) * 3, y, width, height}, {0, 0}, 0, WHITE);
+
+    DrawTexturePro(Global.credit5,
+                   {0, 0, (float)Global.credit5.width, (float)Global.credit5.height},
+                   {startX + (width + spacing) * 4, y, width, height}, {0, 0}, 0, WHITE);
+
+    // Global.Global.mutex.unlock();
+}
+
+void CreditMenu::update() {
+    Global.enableMouse = true;
+    back.update();
+    close.update();
+
+    if (close.action) {
+        Global.CurrentState->unload();
+        Global.CurrentState.reset(new MainMenu());
+    } else if (back.action) {
+        Global.CurrentState->unload();
+        Global.CurrentState.reset(new MainMenu());
+    }
+}
+
+void CreditMenu::unload() {}
+
 MainMenu::MainMenu() {
-    play = Button({250, 420}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
-    load = Button({390, 420}, {120, 60}, {255, 135, 198, 255}, "Load", BLACK, 20);
+    play = Button({160, 420}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
+    load = Button({320, 420}, {120, 60}, {255, 135, 198, 255}, "Load", BLACK, 20);
+    credits = Button({480, 420}, {120, 60}, {255, 135, 198, 255}, "Credits", BLACK, 20);
     volume = TestSlider({510, 460}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);
 }
 void MainMenu::init() {
@@ -209,7 +282,14 @@ void MainMenu::update() {
     Global.enableMouse = true;
     play.update();
     load.update();
+    credits.update();
+
     // test.update();
+
+    PlayMusicStream(Global.menuMusic);
+    SetMusicVolume(Global.menuMusic, 1.0f);
+    UpdateMusicStream(Global.menuMusic);
+
     if (play.action) {
         Global.CurrentState->unload();
         Global.CurrentState.reset(new PlayMenu());
@@ -218,6 +298,11 @@ void MainMenu::update() {
     } else if (load.action) {
         Global.CurrentState->unload();
         Global.CurrentState.reset(new LoadMenu());
+        Global.CurrentState->init();
+        return;
+    } else if (credits.action) {
+        Global.CurrentState->unload();
+        Global.CurrentState.reset(new CreditMenu());
         Global.CurrentState->init();
         return;
     }
@@ -229,12 +314,14 @@ void MainMenu::update() {
         std::cout << "Volume: " << Global.volume << std::endl;
         Global.volumeChanged = true;
     }
+    // UpdateMusicStream(music);
 }
 void MainMenu::render() {
     // Global.mutex.lock();
     DrawTextureCenter(Global.popOManiaLogo, 320, 200, 1 / 3.f, WHITE);
     play.render();
     load.render();
+    credits.render();
     if (IsKeyDown(SDL_SCANCODE_LALT)) volume.render();
 }
 
