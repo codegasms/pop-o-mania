@@ -133,6 +133,26 @@ int main() {
 
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.popOManiaLogo = LoadTexture("resources/pop-o-mania.png");
+    Global.credit1 = LoadTexture("resources/credit1.png");
+    Global.credit2 = LoadTexture("resources/credit2.png");
+    Global.credit3 = LoadTexture("resources/credit3.png");
+    Global.credit4 = LoadTexture("resources/credit4.png");
+    Global.credit5 = LoadTexture("resources/credit5.png");
+
+    FILE* menuBg = fopen("resources/main-bg.mp3", "rb");
+    fseek(menuBg, 0, SEEK_END);
+    long menuBgSize = ftell(menuBg);
+    fseek(menuBg, 0, SEEK_SET);
+    unsigned char* menuBgData = (unsigned char*)malloc(menuBgSize + 1);
+    fread(menuBgData, menuBgSize, 1, menuBg);
+    fclose(menuBg);
+    menuBgData[menuBgSize] = 0;
+    Global.menuMusic =
+        LoadMusicStreamFromMemory(".mp3", (const unsigned char*)menuBgData, menuBgSize);
+
+    // PlayMusicStream(Global.menuMusic);
+    // SetMusicVolume(Global.menuMusic, 1.0f);
+    // UpdateMusicStream(Global.menuMusic);
 
     Global.shdrOutline = LoadShader(0, TextFormat("resources/shaders/glsl%i/outline.fs", 100));
 

@@ -844,11 +844,11 @@ void GameManager::loadDefaultSkin(std::string filename) {
 
     for (int i = 0; i < files.size(); i++) {
         if (IsFileExtension(files[i].c_str(), ".png")) {
-            if (files[i].rfind("hitcircleoverlay.png", 0) == 0)
+            if (files[i].rfind("bubbles.png", 0) == 0)
                 hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
-            else if (files[i].rfind("hitcircleselect.png", 0) == 0)
+            else if (files[i].rfind("bubbles.png", 0) == 0)
                 selectCircle = LoadTexture((Global.Path + files[i]).c_str());
-            else if (files[i].rfind("hitcircle", 0) == 0)
+            else if (files[i].rfind("bubbles", 0) == 0)
                 hitCircle = LoadTexture((Global.Path + files[i]).c_str());
             else if (files[i].rfind("approachcircle", 0) == 0)
                 approachCircle = LoadTexture((Global.Path + files[i]).c_str());
@@ -870,7 +870,7 @@ void GameManager::loadDefaultSkin(std::string filename) {
                 sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
             else if (files[i].rfind("sliderfollowcircle", 0) == 0)
                 sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
-            else if (files[i].rfind("sliderb0", 0) == 0)
+            else if (files[i].rfind("bubbles", 0) == 0)
                 sliderb = LoadTexture((Global.Path + files[i]).c_str());
             else if (files[i].rfind("reversearrow", 0) == 0)
                 reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
@@ -916,11 +916,11 @@ void GameManager::loadGameSkin(std::string filename) {
 
     for (int i = 0; i < files.size(); i++) {
         if (IsFileExtension(files[i].c_str(), ".png")) {
-            if (files[i].rfind("hitcircleoverlay.png", 0) == 0)
+            if (files[i].rfind("bubbles.png", 0) == 0)
                 hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
-            else if (files[i].rfind("hitcircleselect.png", 0) == 0)
+            else if (files[i].rfind("bubbles.png", 0) == 0)
                 selectCircle = LoadTexture((Global.Path + files[i]).c_str());
-            else if (files[i].rfind("hitcircle", 0) == 0)
+            else if (files[i].rfind("bubbles", 0) == 0)
                 hitCircle = LoadTexture((Global.Path + files[i]).c_str());
             else if (files[i].rfind("approachcircle", 0) == 0)
                 approachCircle = LoadTexture((Global.Path + files[i]).c_str());
@@ -942,7 +942,7 @@ void GameManager::loadGameSkin(std::string filename) {
                 sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
             else if (files[i].rfind("sliderfollowcircle", 0) == 0)
                 sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
-            else if (files[i].rfind("sliderb0", 0) == 0)
+            else if (files[i].rfind("bubbles", 0) == 0)
                 sliderb = LoadTexture((Global.Path + files[i]).c_str());
             else if (files[i].rfind("reversearrow", 0) == 0)
                 reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
@@ -990,11 +990,11 @@ void GameManager::loadBeatmapSkin(std::string filename) {
     temprenderSpinnerBack = false;
     for (int i = 0; i < files.size(); i++) {
         if (IsFileExtension(files[i].c_str(), ".png")) {
-            if (files[i].rfind("hitcircleoverlay.png", 0) == 0)
+            if (files[i].rfind("bubbles.png", 0) == 0)
                 hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
-            else if (files[i].rfind("hitcircleselect.png", 0) == 0)
+            else if (files[i].rfind("bubbles.png", 0) == 0)
                 selectCircle = LoadTexture((Global.Path + files[i]).c_str());
-            else if (files[i].rfind("hitcircle", 0) == 0)
+            else if (files[i].rfind("bubbles", 0) == 0)
                 hitCircle = LoadTexture((Global.Path + files[i]).c_str());
             else if (files[i].rfind("approachcircle", 0) == 0)
                 approachCircle = LoadTexture((Global.Path + files[i]).c_str());
